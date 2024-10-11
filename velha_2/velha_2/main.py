@@ -67,6 +67,106 @@ def random_player_move(player):
         # print(f"Jogador {player} escolheu a jogada {move}")
 
 
+def ai_second_move():
+    # Função da IA para tentar vencer ou bloquear
+    for i in range(1, 10):
+        if board[i] == 0:
+            # board[i] = -1
+            make_move(-1, i)
+            if check_winner() == -1:  # Se a IA vencer com essa jogada
+                return
+            # board[i] = 0  # Desfaz o movimento
+            reset_move(i)
+    for i in range(1, 10):
+        if board[i] == 0:
+            # board[i] = 1
+            make_move(1, i)
+            if check_winner() == 1:  # Se o jogador vencer com essa jogada
+                # board[i] = -1  # Bloqueia o jogador
+                reset_move(i)
+                make_move(-1, i)
+                # board[0] += 1
+                # print(f"IA escolhe a jogada {i} para bloquear.")
+                return
+            # board[i] = 0  # Desfaz o movimento
+            reset_move(i)
+
+    if board[0] == 1:
+        if not is_cantos_disponiveis():
+            make_move(-1, 5)
+            return
+        else:
+            if board[5] == 1 or board[2] == 1 or board[4] == 1:
+                make_move(-1, 1)
+                return
+            make_move(-1, 9)
+            return
+    if board[0] == 3:
+        if board[1] == -1 and board[5] != -1:
+            # if board[2] == 1:
+            #     make_move(-1, 5)
+            #     return
+
+            if board[9] == 1:
+                make_move(-1, 3)
+                return
+
+            make_move(-1, 5)
+            return
+        elif board[5] == 0:
+            make_move(-1, 5)
+            return
+
+        else:
+            if board[1] == 1:
+                if board[8] == 1:
+                    make_move(-1, 8)
+                    return
+                elif board[6] == 1:
+                    make_move(-1, 3)
+                    return
+                elif board[9] == 1:
+                    make_move(-1, 8)
+                return
+            elif board[3] == 1:
+                if board[4] == 1:
+                    make_move(-1, 1)
+                    return
+                elif board[7] == 1:
+                    make_move(-1, 8)
+                    return
+                elif board[8] == 1:
+                    make_move(-1, 9)
+                    return
+            elif board[7] == 1:
+                if board[2] == 1:
+                    make_move(-1, 1)
+                    return
+                if board[3] == 1:
+                    make_move(-1, 2)
+                    return
+                if board[6] == 1:
+                    make_move(-1, 9)
+                return
+            elif board[9] == 1:
+                if board[4] == 1:
+                    make_move(-1, 7)
+                    return
+                if board[1] == 1:
+                    make_move(-1, 2)
+                    return
+                if board[2] == 1:
+                    make_move(-1, 3)
+                return
+    random_player_move(-1)
+    return
+
+
+def is_cantos_disponiveis():
+    if board[1] == 0 and board[3] == 0 and board[7] == 0 and board[9] == 0:
+        return True
+
+
 def ai_move():
     # Função da IA para tentar vencer ou bloquear
     for i in range(1, 10):
@@ -135,8 +235,8 @@ def choose_first_player():
 
 
 def play_game():
-    first_move = "ia"
-
+    first_move = "jogador"
+    second = True
     while True:
         # print_board()  # Mostrar tabuleiro a cada jogada
         if first_move == "jogador":
@@ -151,7 +251,11 @@ def play_game():
                 return 0
             first_move = "ia"
         elif first_move == "ia":
-            ai_move()
+            if second:
+                ai_second_move()
+            else:
+                ai_move()
+
             if check_winner() == -1:
                 # print_board()
                 # print("A IA venceu!")
