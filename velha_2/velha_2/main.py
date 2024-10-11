@@ -176,6 +176,7 @@ def ai_second_move(player):
 def ai_move(player):
     if board[0] % 2 != 0:
         ai_second_move(player)
+        return
 
     # Função da IA para tentar vencer ou bloquear
     for i in range(1, 10):
@@ -212,6 +213,7 @@ def ai_move(player):
             if board[4] == 0 and board[7] == 0:
                 make_move(player, 7)
                 return
+    random_player_move(player)
 
 
 def choose_first_player():
@@ -221,71 +223,96 @@ def choose_first_player():
     return choice
 
 
-def play_game():
-    first_move = "jogador"
-    while True:
-        # print_board()  # Mostrar tabuleiro a cada jogada
-        if first_move == "jogador":
-            random_player_move(1)
-            if check_winner() == 1:
-                # print_board()
-                # print("Jogador venceu!")
-                return 1
-            if check_draw():
-                # print_board()
-                # print("Empate!")
-                return 0
-            first_move = "ia"
-        elif first_move == "ia":
-            ai_move(-1)
+def play_game(mode):
+    if mode == "ia_vs_ia":
+        first_move = "ia1"
+        while True:
+            if first_move == "ia1":
+                ai_move(1)  # IA 1 joga como jogador 1 (X)
 
-            if check_winner() == -1:
-                # print_board()
-                # print("A IA venceu!")
-                return -1
-            if check_draw():
-                # print_board()
-                # print("Empate!")
-                return 0
-            first_move = "jogador"
+                if check_winner() == 1:
+                    return 1  # IA 1 venceu
+                if check_draw():
+                    return 0  # Empate
+                first_move = "ia2"
+            elif first_move == "ia2":
+                ai_move(-1)  # IA 2 joga como jogador -1 (O)
+
+                if check_winner() == -1:
+                    return -1  # IA 2 venceu
+                if check_draw():
+                    return 0  # Empate
+                first_move = "ia1"
+    elif mode == "random_vs_ia":
+        first_move = "jogador"
+        while True:
+            if first_move == "jogador":
+                random_player_move(1)  # Jogador aleatório joga como jogador 1 (X)
+                if check_winner() == 1:
+                    return 1  # Jogador aleatório venceu
+                if check_draw():
+                    return 0  # Empate
+                first_move = "ia"
+            elif first_move == "ia":
+                ai_move(-1)  # IA joga como jogador -1 (O)
+                if check_winner() == -1:
+                    return -1  # IA venceu
+                if check_draw():
+                    return 0  # Empate
+                first_move = "jogador"
 
 
 def main():
     num_games = int(input("Quantas partidas você quer jogar? "))
+    game_mode = input("Escolha o modo (ia_vs_ia ou random_vs_ia): ").strip()
 
-    ia_wins = 0
+    ia1_wins = 0
+    ia2_wins = 0
     player_wins = 0
     draws = 0
 
     for game_num in range(1, num_games + 1):
-        # print(f"\nPartida {game_num}:")
         initialize_board()
-        result = play_game()
+        result = play_game(game_mode)
 
-        if result == -1:
-            ia_wins += 1
-        elif result == 1:
-            player_wins += 1
-            # print_board()
+        if result == 1:  # Jogador aleatório ou IA 1 venceu
+            if game_mode == "random_vs_ia":
+                player_wins += 1  # Jogador aleatório venceu
+            else:
+                ia1_wins += 1  # IA 1 venceu
+        elif result == -1:  # IA 2 venceu
+            ia2_wins += 1
         else:
             draws += 1
 
-    # Cálculo e exibição do relatório
-    total_games = ia_wins + player_wins + draws
+    total_games = ia1_wins + ia2_wins + player_wins + draws
     print("\nResultados após", total_games, "jogos:")
-    print(f"Vitórias da IA: {ia_wins} ({ia_wins / total_games * 100:.2f}%)")
-    print(
-        f"Vitórias do jogador: {player_wins} ({player_wins / total_games * 100:.2f}%)"
-    )
+
+    if game_mode == "ia_vs_ia":
+        print(f"Vitórias da IA 1 (X): {ia1_wins} ({ia1_wins / total_games * 100:.2f}%)")
+        print(f"Vitórias da IA 2 (O): {ia2_wins} ({ia2_wins / total_games * 100:.2f}%)")
+    else:
+        print(
+            f"Vitórias do jogador: {player_wins} ({player_wins / total_games * 100:.2f}%)"
+        )
+        print(f"Vitórias da IA: {ia2_wins} ({ia2_wins / total_games * 100:.2f}%)")
+
     print(f"Empates: {draws} ({draws / total_games * 100:.2f}%)")
 
-    # Exibe o jogador com mais vitórias
-    if ia_wins > player_wins:
-        print("\nA IA foi a vencedora geral!")
-    elif player_wins > ia_wins:
-        print("\nO jogador foi o vencedor geral!")
+    if game_mode == "ia_vs_ia":
+        if ia1_wins > ia2_wins:
+            print("\nA IA 1 (X) foi a vencedora geral!")
+        elif ia2_wins > ia1_wins:
+            print("\nA IA 2 (O) foi a vencedora geral!")
+        else:
+            print("\nHouve um empate geral!")
     else:
-        print("\nHouve um empate geral!")
+        if player_wins > ia2_wins:
+            print("\nO jogador foi o vencedor geral!")
+        elif ia2_wins > player_wins:
+            print("\nA IA foi a vencedora geral!")
+        else:
+            print("\nHouve um empate geral!")
 
 
 if __name__ == "__main__":
