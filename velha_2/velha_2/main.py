@@ -1,4 +1,5 @@
 import random
+import matplotlib.pyplot as plt
 
 
 # Inicialização do tabuleiro com 10 posições
@@ -260,11 +261,30 @@ def play_game(mode):
                 if check_draw():
                     return 0  # Empate
                 first_move = "jogador"
+    elif mode == "random_vs_random":
+        first_move = "jogador1"
+        while True:
+            if first_move == "jogador1":
+                random_player_move(1)  # Jogador 1 joga como X
+                if check_winner() == 1:
+                    return 1  # Jogador 1 venceu
+                if check_draw():
+                    return 0  # Empate
+                first_move = "jogador2"
+            elif first_move == "jogador2":
+                random_player_move(-1)  # Jogador 2 joga como O
+                if check_winner() == -1:
+                    return -1  # Jogador 2 venceu
+                if check_draw():
+                    return 0  # Empate
+                first_move = "jogador1"
 
 
 def main():
     num_games = int(input("Quantas partidas você quer jogar? "))
-    game_mode = input("Escolha o modo (ia_vs_ia ou random_vs_ia): ").strip()
+    game_mode = input(
+        "Escolha o modo (ia_vs_ia, random_vs_ia ou random_vs_random): "
+    ).strip()
 
     ia1_wins = 0
     ia2_wins = 0
@@ -278,6 +298,8 @@ def main():
         if result == 1:  # Jogador aleatório ou IA 1 venceu
             if game_mode == "random_vs_ia":
                 player_wins += 1  # Jogador aleatório venceu
+            elif game_mode == "random_vs_random":
+                player_wins += 1  # Jogador 1 venceu
             else:
                 ia1_wins += 1  # IA 1 venceu
         elif result == -1:  # IA 2 venceu
@@ -291,11 +313,18 @@ def main():
     if game_mode == "ia_vs_ia":
         print(f"Vitórias da IA 1 (X): {ia1_wins} ({ia1_wins / total_games * 100:.2f}%)")
         print(f"Vitórias da IA 2 (O): {ia2_wins} ({ia2_wins / total_games * 100:.2f}%)")
-    else:
+    elif game_mode == "random_vs_ia":
         print(
             f"Vitórias do jogador: {player_wins} ({player_wins / total_games * 100:.2f}%)"
         )
         print(f"Vitórias da IA: {ia2_wins} ({ia2_wins / total_games * 100:.2f}%)")
+    elif game_mode == "random_vs_random":
+        print(
+            f"Vitórias do Jogador 1: {player_wins} ({player_wins / total_games * 100:.2f}%)"
+        )
+        print(
+            f"Vitórias do Jogador 2: {ia2_wins} ({ia2_wins / total_games * 100:.2f}%)"
+        )
 
     print(f"Empates: {draws} ({draws / total_games * 100:.2f}%)")
 
@@ -306,6 +335,13 @@ def main():
             print("\nA IA 2 (O) foi a vencedora geral!")
         else:
             print("\nHouve um empate geral!")
+    elif game_mode == "random_vs_random":
+        if player_wins > ia2_wins:
+            print("\nO Jogador 1 foi o vencedor geral!")
+        elif ia2_wins > player_wins:
+            print("\nO Jogador 2 foi o vencedor geral!")
+        else:
+            print("\nHouve um empate geral!")
     else:
         if player_wins > ia2_wins:
             print("\nO jogador foi o vencedor geral!")
@@ -313,6 +349,35 @@ def main():
             print("\nA IA foi a vencedora geral!")
         else:
             print("\nHouve um empate geral!")
+
+    # Gráfico de resultados
+    labels = []
+    sizes = []
+
+    # Adiciona apenas quem jogou
+    if game_mode == "random_vs_ia":
+        labels = ["Jogador", "IA"]
+        sizes = [player_wins, ia2_wins]
+    elif game_mode == "random_vs_random":
+        labels = ["Jogador 1", "Jogador 2"]
+        sizes = [player_wins, ia2_wins]
+    elif game_mode == "ia_vs_ia":
+        labels = ["IA 1", "IA 2"]
+        sizes = [ia1_wins, ia2_wins]
+
+    # Adicionando empates como última label
+    sizes.append(draws)
+    labels.append("Empates")
+
+    colors = ["lightblue", "lightgreen", "salmon", "lightgray"]
+
+    plt.figure(figsize=(8, 6))
+    plt.bar(labels, sizes, color=colors)
+    plt.xlabel("Resultados")
+    plt.ylabel("Quantidade de Vitórias")
+    plt.title("Resultados do Jogo da Velha (com Empates)")
+    plt.grid(axis="y", linestyle="--")
+    plt.show()
 
 
 if __name__ == "__main__":
