@@ -50,6 +50,8 @@ def make_move(player, position):
         board[position] = player
         board[0] += 1  # Incrementa o número de jogadas
         return True
+    print("invalida")
+    print(position)
     return False  # Jogada inválida
 
 
@@ -64,6 +66,9 @@ def random_player_move(player):
     if available_moves:
         move = random.choice(available_moves)
         make_move(player, move)
+        # if board[0] == 1:
+        #     print("random move")
+        #     print(move)
         # print(f"Jogador {player} escolheu a jogada {move}")
 
 
@@ -107,7 +112,7 @@ def ai_second_move():
             #     make_move(-1, 5)
             #     return
 
-            if board[9] == 1:
+            if board[9] == 1 and board[5] == 1:
                 make_move(-1, 3)
                 return
 
@@ -120,7 +125,7 @@ def ai_second_move():
         else:
             if board[1] == 1:
                 if board[8] == 1:
-                    make_move(-1, 8)
+                    make_move(-1, 9)
                     return
                 elif board[6] == 1:
                     make_move(-1, 3)
@@ -158,7 +163,21 @@ def ai_second_move():
                 if board[2] == 1:
                     make_move(-1, 3)
                 return
+    if is_cantos_disponiveis():
+        if board[1] == 0:
+            make_move(-1, 1)
+            return
+        elif board[3] == 0:
+            make_move(-1, 3)
+            return
+        elif board[7] == 0:
+            make_move(-1, 7)
+            return
+        else:
+            make_move(-1, 9)
+            return
     random_player_move(-1)
+    # print("made a random move")
     return
 
 
@@ -283,6 +302,7 @@ def main():
             ia_wins += 1
         elif result == 1:
             player_wins += 1
+            # print_board()
         else:
             draws += 1
 
