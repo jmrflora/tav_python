@@ -224,7 +224,7 @@ def choose_first_player():
     return choice
 
 
-def play_game(mode):
+def play_game(mode, initial_first_move):
     if mode == "ia_vs_ia":
         first_move = "ia1"
         while True:
@@ -245,7 +245,8 @@ def play_game(mode):
                     return 0  # Empate
                 first_move = "ia1"
     elif mode == "random_vs_ia":
-        first_move = "jogador"
+        first_move = initial_first_move
+
         while True:
             if first_move == "jogador":
                 random_player_move(1)  # Jogador aleatório joga como jogador 1 (X)
@@ -281,6 +282,7 @@ def play_game(mode):
 
 
 def main():
+    initial_first_move = "jogador"
     num_games = int(input("Quantas partidas você quer jogar? "))
     game_mode = input(
         "Escolha o modo (ia_vs_ia, random_vs_ia ou random_vs_random): "
@@ -293,7 +295,7 @@ def main():
 
     for game_num in range(1, num_games + 1):
         initialize_board()
-        result = play_game(game_mode)
+        result = play_game(game_mode, initial_first_move)
 
         if result == 1:  # Jogador aleatório ou IA 1 venceu
             if game_mode == "random_vs_ia":
@@ -356,8 +358,12 @@ def main():
 
     # Adiciona apenas quem jogou
     if game_mode == "random_vs_ia":
-        labels = ["Jogador", "IA"]
-        sizes = [player_wins, ia2_wins]
+        if initial_first_move == "ia":
+            labels = ["IA", "aleatorio"]
+            sizes = [ia2_wins, player_wins]
+        else:
+            labels = ["aleatorio", "IA"]
+            sizes = [player_wins, ia2_wins]
     elif game_mode == "random_vs_random":
         labels = ["Jogador 1", "Jogador 2"]
         sizes = [player_wins, ia2_wins]
