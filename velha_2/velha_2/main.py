@@ -1,9 +1,9 @@
-import random
 import csv
 
 import matplotlib.pyplot as plt
 
 from .play_game import Mode, play_game
+from .ml import train_agent, test_agent, plot_results
 
 
 # Inicialização do tabuleiro com 10 posições
@@ -226,5 +226,14 @@ def main():
     plt.show()
 
 
+def test_ml():
+    print("Iniciando treinamento...")
+    train_agent(100000)
+
+    print("Iniciando teste...")
+    test_results = test_agent(10000)
+    plot_results(test_results)
+
+
 if __name__ == "__main__":
-    main()
+    test_ml()
